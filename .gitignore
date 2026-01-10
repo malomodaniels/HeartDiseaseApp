@@ -1,16 +1,45 @@
+# =====================
 # Virtual environments
+# =====================
 venv/
-.env/
+.venv/
+env/
 
-# Python cache
+# =====================
+# Python cache / build
+# =====================
 __pycache__/
-*.pyc
+*.py[cod]
+*.pyo
+*.pyd
 
-# OS files
+# =====================
+# Jupyter / notebooks
+# =====================
+.ipynb_checkpoints/
+
+# =====================
+# OS / editor junk
+# =====================
 .DS_Store
 Thumbs.db
+.vscode/
 
-# Models / binaries
+# =====================
+# Logs
+# =====================
+*.log
+
+# =====================
+# ML artifacts (optional, recommended)
+# =====================
 *.pkl
-*.joblib
-*.dll
+models/*.pkl
+outputs/
+evaluation/outputs/
+
+# =====================
+# Flask
+# =====================
+instance/
+.env
