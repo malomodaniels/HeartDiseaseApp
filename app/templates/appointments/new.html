@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-7">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h2 class="h4 mb-3">Book Appointment</h2>
+        <form method="post" action="{{ url_for('appointments.create') }}">
+        {% if risk_score %}
+          <input type="hidden" name="risk_score" value="{{ risk_score }}">
+          <div class="alert alert-info">Risk score attached to booking: {{ risk_score }}</div>
+        {% endif %}
+        {% if is_high_risk and recommended_slots %}
+          <div class="alert alert-warning">
+            <div><strong>High-risk prioritisation:</strong> recommended earliest available slots for {{ recommended_date }}.</div>
+            <div class="mt-2 d-flex flex-wrap gap-2">
+              {% for t in recommended_slots %}
+                <button type="button" class="btn btn-sm btn-outline-dark"
+                        onclick="document.getElementById('appointment_time').value='{{ t.strftime('%H:%M') }}'">
+                  {{ t.strftime('%H:%M') }}
+                </button>
+              {% endfor %}
+            </div>
+            <div class="small text-muted mt-2">Click a time to auto-fill the appointment time field.</div>
+          </div>
+        {% endif %}
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Date</label>
+              <input class="form-control" type="date" name="appointment_date" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Time (HH:MM)</label>
+              <input class="form-control" type="time" name="appointment_time" required>
+              <div class="form-text">Clinic hours: 09:00–16:00</div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Clinic unit (optional)</label>
+            <input class="form-control" name="clinic_unit" placeholder="e.g., Cardiology">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Notes (optional)</label>
+            <textarea class="form-control" name="notes" rows="3"></textarea>
+          </div>
+          <button class="btn btn-success" type="submit">Book</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

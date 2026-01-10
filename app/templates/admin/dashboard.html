@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+  <div class="p-4 bg-dark text-white rounded shadow-sm mb-4 text-center">
+    <h1 class="display-6 fw-bold">Admin Dashboard</h1>
+    <p class="opacity-75">System performance & scheduling overview</p>
+  </div>
+
+  <!-- Date filter -->
+  <form class="d-flex align-items-end gap-2" method="get" action="{{ url_for('admin.dashboard') }}">
+    <div>
+      <label class="form-label mb-1 text-muted small">As at date</label>
+      <input type="date" class="form-control" name="date" value="{{ selected_date }}">
+    </div>
+    <button class="btn btn-dark">Apply</button>
+    <a class="btn btn-outline-secondary" href="{{ url_for('admin.dashboard') }}">Reset</a>
+  </form>
+</div>
+
+<!-- KPI cards -->
+<div class="row g-3 mb-4">
+  <div class="col-12 col-md-3">
+    <div class="card card-soft h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <div class="text-muted small">Total</div>
+            <div class="display-6 fw-bold mb-0">{{ total }}</div>
+          </div>
+          <span class="badge text-bg-light border">All visits</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-md-3">
+    <div class="card card-soft h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <div class="text-muted small">Completed</div>
+            <div class="display-6 fw-bold mb-0">{{ completed }}</div>
+          </div>
+          <span class="badge text-bg-success">Done</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-md-3">
+    <div class="card card-soft h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <div class="text-muted small">No-shows</div>
+            <div class="display-6 fw-bold mb-0">{{ no_show }}</div>
+          </div>
+          <span class="badge text-bg-warning">Missed</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-md-3">
+    <div class="card card-soft h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <div class="text-muted small">Cancelled</div>
+            <div class="display-6 fw-bold mb-0">{{ cancelled }}</div>
+          </div>
+          <span class="badge text-bg-secondary">Dropped</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-12 col-lg-4">
+    <div class="card card-soft h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <div>
+            <div class="text-muted small">No-show rate</div>
+            <div class="h2 fw-bold mb-0">{{ no_show_rate|pct }}</div>
+          </div>
+          <span class="badge text-bg-light border">No-show / (total - cancelled)</span>
+        </div>
+        <div class="text-muted small">
+          Reduce no-shows by sending reminders and confirming appointments 24 hours before.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-4">
+    <div class="card card-soft h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <div>
+            <div class="text-muted small">Utilisation</div>
+            <div class="h2 fw-bold mb-0">{{ utilisation|pct }}</div>
+          </div>
+          <span class="badge text-bg-light border">Completed / Total</span>
+        </div>
+        <div class="text-muted small">
+          Monitor utilisation to balance capacity, staffing, and clinic flow.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-4">
+    <div class="card card-soft h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <div>
+            <div class="text-muted small">Risk breakdown</div>
+            <div class="d-flex gap-2 align-items-end">
+              <div>
+                <div class="h3 fw-bold mb-0">{{ high_risk }}</div>
+                <div class="text-muted small">High risk</div>
+              </div>
+              <div class="border-start ps-3">
+                <div class="h3 fw-bold mb-0">{{ low_risk }}</div>
+                <div class="text-muted small">Low risk</div>
+              </div>
+            </div>
+          </div>
+          <span class="badge text-bg-light border">From risk_score</span>
+        </div>
+        <div class="text-muted small">
+          Use risk to prioritise follow-ups and triage workflows where needed.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Charts + Actions -->
+<style>
+  /* constrain donut so it doesn't blow up */
+  .chart-box{
+    height: 360px;         /* tweak: 300–420 depending on taste */
+    position: relative;    /* required for Chart.js sizing */
+  }
+</style>
+
+<div class="row g-3 align-items-stretch">
+  <!-- Left: Donut -->
+  <div class="col-12 col-lg-8 d-flex">
+    <div class="card card-soft flex-fill">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <h2 class="h5 mb-0">Appointments overview</h2>
+            <div class="text-muted small">Distribution across status types</div>
+          </div>
+          <span class="badge text-bg-light border">Last 30 days</span>
+        </div>
+
+        <div class="chart-box">
+          <canvas id="statusChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Actions + Quality -->
+  <div class="col-12 col-lg-4 d-flex flex-column gap-3">
+    <div class="card card-soft">
+      <div class="card-body">
+        <h2 class="h5 mb-2">Quick actions</h2>
+        <div class="text-muted small mb-3">Jump straight into admin tools.</div>
+
+        <div class="d-grid gap-2">
+          <a class="btn btn-accent" href="{{ url_for('admin.schedule') }}">Open Schedule</a>
+          <a class="btn btn-outline-accent" href="{{ url_for('sensitization.admin_list') }}">Manage Sensitization Posts</a>
+        </div>
+
+        <hr class="my-3">
+        <div class="text-muted small">
+          Tip: Use the schedule to update visit status, then watch changes reflect here.
+        </div>
+      </div>
+    </div>
+
+    <div class="card card-soft">
+      <div class="card-body">
+        <h2 class="h6 mb-2">Quality signals</h2>
+        <canvas id="qualityChart" height="150"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+  // Status distribution (doughnut)
+  const statusCtx = document.getElementById("statusChart");
+  new Chart(statusCtx, {
+    type: "doughnut",
+    data: {
+      labels: ["Completed", "Booked", "No-show", "Cancelled"],
+      datasets: [{
+        data: [{{ completed }}, {{ booked }}, {{ no_show }}, {{ cancelled }}]
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: "bottom" }
+      },
+      cutout: "62%"
+    }
+  });
+
+  // Quality chart (bars): utilisation + no-show rate
+  const qualityCtx = document.getElementById("qualityChart");
+  new Chart(qualityCtx, {
+    type: "bar",
+    data: {
+      labels: ["Utilisation", "No-show rate"],
+      datasets: [{
+        data: [{{ utilisation }}, {{ no_show_rate }}]
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: 1,
+          ticks: {
+            callback: (v) => (v * 100).toFixed(0) + "%"
+          }
+        }
+      },
+      plugins: {
+        legend: { display: false }
+      }
+    }
+  });
+</script>
+
+{% endblock %}

@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- HERO -->
+<section class="hero mb-4">
+  <div class="hero-inner">
+    <div class="row align-items-end g-4">
+      <div class="col-lg-7">
+        <span class="badge rounded-pill bg-light text-dark fw-semibold px-3 py-2">
+          Web-only Hospital Information System
+        </span>
+
+        <h1 class="display-5 mt-3 mb-2">Intelligent Integrated Health (IIH)</h1>
+
+        <p class="lead mb-3">
+          Clinical Decision Support for heart risk screening, appointment scheduling with attendance tracking,
+          a sensitization hub, and an admin dashboard — all in one place.
+        </p>
+
+        <div class="d-flex flex-wrap gap-2 mt-3">
+          <a class="btn btn-accent btn-lg" href="{{ url_for('prediction.form') }}">
+            Run Heart Risk Prediction
+          </a>
+
+          {% if current_user.is_authenticated and current_user.role in ['admin','clinician','public_health'] %}
+            <a class="btn btn-outline-light btn-lg" href="{{ url_for('admin.dashboard') }}">
+              Open Dashboard
+            </a>
+          {% endif %}
+
+          <a class="btn btn-outline-light btn-lg" href="{{ url_for('sensitization.index') }}">
+            Health Sensitization
+          </a>
+        </div>
+
+        <div class="d-flex gap-3 mt-3 text-white-50 small">
+          <span>Secure access</span>
+          <span>Fast workflow</span>
+          <span>Decision support</span>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="col-lg-5">
+        <div class="card card-soft">
+          <div class="card-body p-4">
+            <h5 class="mb-1">Quick Actions</h5>
+            <p class="text-muted mb-3">Jump straight into what you need.</p>
+
+            <div class="d-grid gap-2">
+              <a class="btn btn-accent" href="{{ url_for('prediction.form') }}">Start Risk Check</a>
+
+              {% if current_user.is_authenticated and current_user.role in ['admin','clinician','public_health'] %}
+                <a class="btn btn-outline-accent" href="{{ url_for('admin.schedule') }}">Open Clinic Schedule</a>
+              {% else %}
+                <a class="btn btn-outline-accent disabled" href="#" tabindex="-1" aria-disabled="true">
+                  Open Clinic Schedule (staff)
+                </a>
+              {% endif %}
+
+              <a class="btn btn-outline-accent" href="{{ url_for('sensitization.index') }}">View Health Posts</a>
+
+              {% if current_user.is_authenticated and current_user.role == 'patient' %}
+                <a class="btn btn-outline-accent" href="{{ url_for('appointments.new') }}">Book Appointment</a>
+              {% else %}
+                <a class="btn btn-outline-accent" href="{{ url_for('auth.login') }}">Login to Book</a>
+              {% endif %}
+            </div>
+
+            <hr class="my-3">
+            <p class="text-muted small mb-0">
+              Tip: Use the dashboard to monitor appointments, attendance, and engagement.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURE CARDS -->
+<section class="row g-3 mb-4">
+  <div class="col-md-6 col-lg-3">
+    <div class="card card-soft h-100">
+      <div class="card-body">
+        <span class="badge bg-light text-dark">DSS</span>
+        <h6 class="mt-2 mb-1">Heart Risk Prediction</h6>
+        <p class="text-muted small mb-3">Enter clinical indicators and generate a risk estimate to support triage and referral.</p>
+        <a class="btn btn-sm btn-outline-accent" href="{{ url_for('prediction.form') }}">Open Form</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-lg-3">
+    <div class="card card-soft h-100">
+      <div class="card-body">
+        <span class="badge bg-light text-dark">OPS</span>
+        <h6 class="mt-2 mb-1">Appointment Scheduling</h6>
+        <p class="text-muted small mb-3">Book visits, track attendance, and support clinic flow with minimal friction.</p>
+        {% if current_user.is_authenticated and current_user.role == 'patient' %}
+          <a class="btn btn-sm btn-outline-accent" href="{{ url_for('appointments.new') }}">Book Now</a>
+        {% else %}
+          <a class="btn btn-sm btn-outline-accent" href="{{ url_for('auth.login') }}">Login to Book</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-lg-3">
+    <div class="card card-soft h-100">
+      <div class="card-body">
+        <span class="badge bg-light text-dark">EDU</span>
+        <h6 class="mt-2 mb-1">Health Sensitization</h6>
+        <p class="text-muted small mb-3">Public health posts with visuals, simple guidance, and practical prevention tips.</p>
+        <a class="btn btn-sm btn-outline-accent" href="{{ url_for('sensitization.index') }}">Explore</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-lg-3">
+    <div class="card card-soft h-100">
+      <div class="card-body">
+        <span class="badge bg-light text-dark">ADMIN</span>
+        <h6 class="mt-2 mb-1">Operational Dashboard</h6>
+        <p class="text-muted small mb-3">Visibility into bookings, no-shows, utilisation, and activity — in one place.</p>
+        {% if current_user.is_authenticated and current_user.role in ['admin','clinician','public_health'] %}
+          <a class="btn btn-sm btn-outline-accent" href="{{ url_for('admin.dashboard') }}">Open</a>
+        {% else %}
+          <a class="btn btn-sm btn-outline-accent" href="{{ url_for('auth.login') }}">Staff Login</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES TILES (New Upgrade) -->
+<section class="mb-4">
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <h5 class="mb-0">Services</h5>
+    <span class="text-muted small">Core care units supported by IIH workflows</span>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-md-6 col-lg-3">
+      <div class="card card-soft h-100">
+        <div class="card-body">
+          <h6 class="mb-1">Cardiology</h6>
+          <p class="text-muted small mb-3">Risk screening support, triage guidance, and referral readiness.</p>
+          <a class="btn btn-sm btn-outline-accent" href="{{ url_for('prediction.form') }}">Run Risk Check</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+      <div class="card card-soft h-100">
+        <div class="card-body">
+          <h6 class="mb-1">General Clinic</h6>
+          <p class="text-muted small mb-3">Appointments, attendance tracking, and faster front-desk coordination.</p>
+          {% if current_user.is_authenticated and current_user.role == 'patient' %}
+            <a class="btn btn-sm btn-outline-accent" href="{{ url_for('appointments.new') }}">Book Visit</a>
+          {% else %}
+            <a class="btn btn-sm btn-outline-accent" href="{{ url_for('auth.login') }}">Login to Book</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+      <div class="card card-soft h-100">
+        <div class="card-body">
+          <h6 class="mb-1">Public Health</h6>
+          <p class="text-muted small mb-3">Education posts, campaigns, and prevention messaging for patients.</p>
+          <a class="btn btn-sm btn-outline-accent" href="{{ url_for('sensitization.index') }}">View Posts</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+      <div class="card card-soft h-100">
+        <div class="card-body">
+          <h6 class="mb-1">Emergency</h6>
+          <p class="text-muted small mb-3">Quick pathways to triage decisions and clinic workflow visibility.</p>
+          {% if current_user.is_authenticated and current_user.role in ['admin','clinician','public_health'] %}
+            <a class="btn btn-sm btn-outline-accent" href="{{ url_for('admin.dashboard') }}">Open Ops View</a>
+          {% else %}
+            <a class="btn btn-sm btn-outline-accent disabled" href="#" tabindex="-1" aria-disabled="true">Staff Only</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS (New Upgrade) -->
+<section class="card card-soft mb-4">
+  <div class="card-body p-4">
+    <h5 class="mb-1">How it works</h5>
+    <p class="text-muted mb-3">A simple flow for patients and staff.</p>
+
+    <div class="row g-3">
+      <div class="col-md-4">
+        <div class="p-3 rounded bg-white border">
+          <div class="fw-semibold mb-1">1) Screen</div>
+          <div class="text-muted small">Enter patient indicators to estimate heart disease risk and guide next steps.</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="p-3 rounded bg-white border">
+          <div class="fw-semibold mb-1">2) Schedule</div>
+          <div class="text-muted small">Book appointments and track attendance with a clean clinic workflow.</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="p-3 rounded bg-white border">
+          <div class="fw-semibold mb-1">3) Educate & Monitor</div>
+          <div class="text-muted small">Publish sensitization posts and monitor activity via the dashboard.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER (New Upgrade) -->
+<footer class="mt-4">
+  <div class="card card-soft">
+    <div class="card-body p-4">
+      <div class="row g-3 align-items-start">
+        <div class="col-md-5">
+          <div class="fw-bold">IIH Web — Intelligent Integrated Health</div>
+          <div class="text-muted small">Web-only HIS for screening, scheduling, education, and operations.</div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="fw-semibold mb-1">Contact</div>
+          <div class="text-muted small">Address: <span class="text-muted">IIH Web</span></div>
+          <div class="text-muted small">Phone: <span class="text-muted">+234 [xxx xxx xxxx]</span></div>
+          <div class="text-muted small">Email: <span class="text-muted">info@iih.hospital</span></div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="fw-semibold mb-1">Hours</div>
+          <div class="text-muted small">Mon–Fri: 8:00am – 6:00pm</div>
+          <div class="text-muted small">Sat: 9:00am – 2:00pm</div>
+          <div class="text-muted small">Emergency: 24/7</div>
+        </div>
+      </div>
+
+      <hr class="my-3">
+      <div class="d-flex justify-content-between flex-wrap gap-2 small text-muted">
+        <span>© {{ (now().year if now is defined else "") }} IIH Web</span>
+        <span>Privacy • Terms • Support</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+{% endblock %}

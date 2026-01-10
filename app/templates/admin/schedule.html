@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="h4 mb-0">Clinic Schedule — {{ day }}</h2>
+  <form class="d-flex gap-2" method="get" action="{{ url_for('admin.schedule') }}">
+    <input class="form-control" type="date" name="day" value="{{ day }}">
+    <button class="btn btn-outline-primary" type="submit">Go</button>
+  </form>
+</div>
+
+<div class="card shadow-sm">
+  <div class="card-body">
+    {% if appts|length == 0 %}
+      <p class="mb-0">No appointments for this day.</p>
+    {% else %}
+    <div class="table-responsive">
+      <table class="table table-sm align-middle">
+        <thead>
+          <tr>
+            <th>Time</th><th>Patient</th><th>Unit</th><th>Status</th><th>Update</th>
+            <th>Risk</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for a in appts %}
+          <tr>
+            <td>{{ a.appointment_time.strftime('%H:%M') }}</td>
+            <td>{{ a.patient.full_name }}<div class="text-muted small">{{ a.patient.email }}</div></td>
+            <td>{{ a.clinic_unit or '—' }}</td>
+            <td><span class="badge text-bg-secondary">{{ a.status }}</span></td>
+            <td>
+  {% if a.risk_score is not none %}
+    {% if a.risk_score >= 0.5 %}
+      <span class="badge bg-danger">High ({{ a.risk_score|round(3) }})</span>
+    {% else %}
+      <span class="badge bg-success">Low ({{ a.risk_score|round(3) }})</span>
+    {% endif %}
+  {% else %}
+    —
+  {% endif %}
+            </td>
+            <td>
+              <form method="post" action="{{ url_for('admin.update_status', appt_id=a.id) }}" class="d-flex gap-2">
+                <select class="form-select form-select-sm" name="status">
+                  {% for s in ['booked','completed','no_show','cancelled'] %}
+                    <option value="{{ s }}" {% if a.status == s %}selected{% endif %}>{{ s }}</option>
+                  {% endfor %}
+                </select>
+                <button class="btn btn-sm btn-primary" type="submit">Save</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

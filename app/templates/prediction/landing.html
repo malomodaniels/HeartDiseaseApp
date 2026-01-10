@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="p-5 bg-white rounded shadow-sm text-center">
+  <h2 class="fw-bold mb-2">Heart Disease Risk Assessment</h2>
+  <p class="text-muted mb-4">
+    Enter clinical indicators to estimate cardiovascular risk and proceed to scheduling.
+  </p>
+
+  <a class="btn btn-accent btn-lg" href="{{ url_for('prediction.form') }}">
+    Start Risk Prediction
+  </a>
+</div>
+
+{% endblock %}

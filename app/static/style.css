@@ -1,0 +1,22 @@
+body {
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  font-family: "Poppins", sans-serif;
+  color: white;
+}
+
+.card-custom {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.btn-glow {
+  transition: 0.3s;
+}
+.btn-glow:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 12px #38bdf8;
+}

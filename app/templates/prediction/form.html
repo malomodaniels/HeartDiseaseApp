@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="section-card">
+  <div class="p-4 text-center rounded mb-3 text-white"
+     style="background: linear-gradient(90deg, #005c97, #363795);">
+  <h1 class="fw-bold">Heart Disease Risk Check</h1>
+  <p class="opacity-75">Enter indicators to estimate risk and proceed to scheduling</p>
+</div>
+
+  <form method="post" action="{{ url_for('prediction.run') }}">
+    
+    {# 1) define groups #}
+    {% set groups = {
+      "Patient Profile": ["age", "sex", "cp"],
+      "Vital Signs": ["trestbps", "chol", "fbs"],
+      "Exercise & ECG": ["restecg", "thalach", "exang", "oldpeak", "slope"],
+      "Imaging / Vessel": ["ca", "thal"]
+    } %}
+
+    {# 2) render each group #}
+    {% for title, keys in groups.items() %}
+      <div class="mb-4">
+        <h5 class="text-danger mb-3">{{ title }}</h5>
+
+        <div class="row g-3">
+          {% for k in keys %}
+            {% if k in features %}
+              <div class="col-md-4">
+                <label class="form-label text-capitalize">{{ k }}</label>
+                <input
+                  class="form-control"
+                  name="{{ k }}"
+                  value="{{ request.form.get(k, '') }}"
+                  required
+                >
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    {% endfor %}
+
+    {# 3) render any remaining fields that weren't mapped (optional) #}
+    {% set mapped = groups.values()|sum(start=[]) %}
+    {% set extras = features|reject('in', mapped)|list %}
+    {% if extras %}
+      <div class="mb-4">
+        <h5 class="text-danger mb-3">Other Inputs</h5>
+        <div class="row g-3">
+          {% for k in extras %}
+            <div class="col-md-4">
+              <label class="form-label text-capitalize">{{ k }}</label>
+              <input class="form-control" name="{{ k }}" value="{{ request.form.get(k, '') }}">
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    <button class="btn btn-danger btn-lg px-4">
+      Assess Risk
+    </button>
+  </form>
+</div>
+
+{% endblock %}

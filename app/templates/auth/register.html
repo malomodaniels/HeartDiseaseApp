@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h2 class="h4 mb-3">Create Patient Account</h2>
+        <form method="post" action="{{ url_for('auth.register_post') }}">
+          <div class="mb-3">
+            <label class="form-label">Full name</label>
+            <input class="form-control" name="full_name" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input class="form-control" name="email" type="email" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input class="form-control" name="password" type="password" required>
+            <input type="hidden" name="next" value="{{ next or '' }}">
+          </div>
+          <button class="btn btn-success w-100" type="submit">Register</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

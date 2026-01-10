@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="h4 mb-0">My Appointments</h2>
+  <a class="btn btn-success" href="{{ url_for('appointments.new') }}">Book new</a>
+</div>
+<div class="card shadow-sm">
+  <div class="card-body">
+    {% if appts|length == 0 %}
+      <p class="mb-0">No appointments yet.</p>
+    {% else %}
+      <div class="table-responsive">
+        <table class="table table-sm align-middle">
+          <thead>
+            <tr>
+              <th>Date</th><th>Time</th><th>Unit</th><th>Status</th><th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for a in appts %}
+            <tr>
+              <td>{{ a.appointment_date }}</td>
+              <td>{{ a.appointment_time.strftime('%H:%M') }}</td>
+              <td>{{ a.clinic_unit or '—' }}</td>
+              <td><span class="badge text-bg-secondary">{{ a.status }}</span></td>
+              <td class="text-end">
+                {% if a.status == 'booked' %}
+                  <form method="post" action="{{ url_for('appointments.cancel', appt_id=a.id) }}" style="display:inline">
+                    <button class="btn btn-sm btn-outline-danger" type="submit">Cancel</button>
+                  </form>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

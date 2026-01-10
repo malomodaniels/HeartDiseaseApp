@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- New styled header section -->
+<div class="p-5 rounded shadow-sm text-center text-white"
+     style="background: linear-gradient(135deg, #0a1f3d, #1b3a5f);">
+  <h1 class="display-5 fw-bold">Heart Disease Risk Assessment</h1>
+  <p class="lead">Evidence‑based cardiovascular prediction system</p>
+</div>
+
+<!-- Result card -->
+<div class="mt-4 p-4 bg-white rounded shadow-sm text-center">
+  <h2 class="h4 text-{{ risk_color }}">
+    {{ risk_level }} Cardiovascular Risk
+  </h2>
+
+  <p class="mt-2">
+    Estimated risk score: <strong>{{ proba | round(3) }}</strong>
+  </p>
+
+  {% if risk_level == "Low" %}
+    <p class="text-muted">
+      No immediate indication of heart disease. Maintain healthy habits and routine medical check‑ups.
+    </p>
+  {% elif risk_level == "Moderate" %}
+    <p class="text-warning">
+      Some indicators suggest elevated cardiovascular risk. A clinical evaluation is advised.
+    </p>
+  {% else %}
+    <p class="text-danger fw-bold">
+      High likelihood of heart disease indicators. Please seek medical attention promptly.
+    </p>
+  {% endif %}
+
+  <div class="mt-3 d-flex justify-content-center gap-2 flex-wrap">
+    <a class="btn btn-outline-primary" href="{{ url_for('prediction.form') }}">
+      Run another prediction
+    </a>
+
+    <a class="btn btn-success"
+       href="{{ url_for('appointments.new', risk_score=proba, risk_level=risk_level) }}">
+      Book appointment now
+    </a>
+  </div>
+</div>
+
+{% endblock %}
